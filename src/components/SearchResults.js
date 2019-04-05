@@ -3,9 +3,13 @@ import React, { Component } from "react";
 // Custom app css
 import "../App.css";
 
+// Custom Link component
+import Link from "./Link";
+
 // Declare Search Results class
 class SearchResults extends Component {
   // Render the search results JSX based on the following:
+  // Custom boxed result entry for each book with
   // Image, Title, Authors and Publisher
   render() {
     return (
@@ -13,52 +17,59 @@ class SearchResults extends Component {
         {// If there are search results go through each of those JSON entries as map
         this.props.items !== undefined &&
           this.props.items.map((item, i) => {
-            // Save infoLink
-            let infoLink =
-              item.volumeInfo !== undefined ? item.volumeInfo.infoLink : "#";
+            /**
+             * This pattern is repeated several times here for publisher,
+             * authors, imageLinks, title, infolink. Can you find a way to
+             * eliminate that repetition - perhaps by extracting a function out
+             * and reusing it in each case?
+             *
+             */
 
-            // Save title
-            let title =
-              item.volumeInfo !== undefined ? item.volumeInfo.title : "";
+            // Initialize variables
+            let infoLink = "#";
+            let title = "";
+            let imageLinks = "";
+            let authors = "";
+            let publisher = "";
 
-            // Save image link
-            let imageLinks =
-              item.volumeInfo !== undefined
-                ? item.volumeInfo.imageLinks
-                : undefined;
+            if (item.volumeInfo !== undefined) {
+              // Save infoLink
+              infoLink = item.volumeInfo.infoLink;
 
-            // Save authors
-            let authors =
-              item.volumeInfo !== undefined
-                ? item.volumeInfo.authors
-                : undefined;
+              // Save title
+              title = item.volumeInfo.title;
 
-            // Save publishers
-            let publisher =
-              item.volumeInfo !== undefined ? item.volumeInfo.publisher : "";
+              // Save image link
+              imageLinks =
+                item.volumeInfo.imageLinks !== undefined
+                  ? item.volumeInfo.imageLinks.thumbnail
+                  : "";
+
+              // Save authors
+              authors =
+                item.volumeInfo.authors !== undefined
+                  ? item.volumeInfo.authors.join(", ")
+                  : "";
+
+              // Save publisher
+              publisher = item.volumeInfo.publisher;
+            }
+
+            /**
+             * Can you find a way to pull the html out into separate
+             * files from the logic?
+             *
+             * See Link tag below
+             */
             return (
-              <a
-                className="book"
-                href={infoLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
                 key={i}
                 title={title}
-              >
-                <img
-                  className="bookImage"
-                  src={imageLinks !== undefined ? imageLinks.thumbnail : ""}
-                  alt={title}
-                  title={title}
-                />
-                <div className="titleText">
-                  Title: {title}
-                  <br />
-                  Authors: {authors !== undefined ? authors.join(", ") : ""}
-                  <br />
-                  Publisher: {publisher}
-                </div>
-              </a>
+                infoLink={infoLink}
+                imageLink={imageLinks}
+                authors={authors}
+                publisher={publisher}
+              />
             );
           })}
       </div>
